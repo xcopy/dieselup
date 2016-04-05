@@ -1,0 +1,6 @@
+.idea/
+vendor/
+.env
+composer.lock
+response.html
+cookie.dat
