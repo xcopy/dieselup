@@ -142,5 +142,4 @@ class DieselUp
     }
 }
 
-$dieselup = new DieselUp();
-$dieselup->invoke();
+(new DieselUp())->invoke();
