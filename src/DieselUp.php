@@ -1,6 +1,8 @@
 <?php
 
 use Dotenv\Dotenv;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 class DieselUp
 {
@@ -48,22 +50,31 @@ class DieselUp
     }
 
     /**
-     * @throws \LengthException
+     * @throws ErrorException
+     * @throws LengthException
      */
     private function post()
     {
-        $arguments = $_SERVER['argv'];
+        $argv = $_SERVER['argv'];
 
-        if (count($arguments) == 1) {
-            throw new \LengthException;
+        array_shift($argv);
+
+        if (!count($argv)) {
+            throw new \LengthException('Not enough arguments');
         }
 
-        $response = $this->request($this->getUrl(['showtopic' => $arguments[1]]));
+        $response = $this->request($this->getUrl(['showtopic' => $argv[0]]));
 
         $document = new \DOMDocument;
         $document->loadHTML($response);
 
         $xpath = new \DomXpath($document);
+
+        $error = $xpath->query('//div[contains(@class, "errorwrap")]');
+
+        if ($error->length) {
+            throw new \ErrorException('Page not found');
+        }
 
         $deleteLinks = $xpath->query('//a[contains(@href, "javascript:delete_post")]');
 
@@ -134,3 +145,8 @@ class DieselUp
         return (string) $result;
     }
 }
+
+set_exception_handler(function ($e) {
+    $app = new Application;
+    $app->renderException($e, new ConsoleOutput);
+});
