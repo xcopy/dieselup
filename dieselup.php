@@ -85,9 +85,9 @@ class DieselUp
 
         $replyParams = ['Post' => 'UP'];
 
-        $replyForm = $xpath->query('//form[contains(@name, "REPLIER")]');
+        $replyForms = $xpath->query('//form[contains(@name, "REPLIER")]');
 
-        $hiddenInputs = $xpath->query('.//input[contains(@type, "hidden")]', $replyForm->item(0));
+        $hiddenInputs = $xpath->query('.//input[contains(@type, "hidden")]', $replyForms->item(0));
 
         foreach ($hiddenInputs as $input) {
             /** @var $input \DOMElement */
