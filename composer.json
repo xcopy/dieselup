@@ -1,5 +1,16 @@
 {
+    "name": "xcopy/dieselup",
+    "description": "Lift up your topic to the top in Diesel Forum",
+    "keywords": ["diesel", "elcat", "up", "dieselup"],
+    "homepage": "https://github.com/xcopy/dieselup",
+    "authors": [{
+        "name": "Kairat Jenishev",
+        "email": "kairat.jenishev@gmail.com"
+    }],
     "require": {
         "vlucas/phpdotenv": "^2.2"
+    },
+    "autoload": {
+        "classmap": ["src/"]
     }
 }

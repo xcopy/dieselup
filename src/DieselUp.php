@@ -1,23 +1,15 @@
 <?php
 
-namespace DieselUp;
-
-require_once 'vendor/autoload.php';
-
 use Dotenv\Dotenv;
-
-libxml_use_internal_errors(true);
 
 class DieselUp
 {
-    // const BASE_URL = 'https://diesel.elcat.kg/index.php';
-
     /**
      * Constructor
      */
     public function __construct()
     {
-        $dotenv = new Dotenv(__DIR__);
+        $dotenv = new Dotenv(dirname(dirname(__FILE__)));
         $dotenv->load();
     }
 
@@ -26,7 +18,6 @@ class DieselUp
      */
     public function invoke()
     {
-        // sleep(10);
         $this->login();
         $this->post();
     }
@@ -57,13 +48,17 @@ class DieselUp
     }
 
     /**
-     * @return void
+     * @throws \LengthException
      */
     private function post()
     {
-        $topicId = getopt('t:')['t'];
+        $arguments = $_SERVER['argv'];
 
-        $response = $this->request($this->getUrl(['showtopic' => $topicId]));
+        if (count($arguments) == 1) {
+            throw new \LengthException;
+        }
+
+        $response = $this->request($this->getUrl(['showtopic' => $arguments[1]]));
 
         $document = new \DOMDocument;
         $document->loadHTML($response);
@@ -136,10 +131,6 @@ class DieselUp
 
         curl_close($ch);
 
-        // file_put_contents('response.html', $result);
-
         return (string) $result;
     }
 }
-
-(new DieselUp())->invoke();
