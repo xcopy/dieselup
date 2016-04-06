@@ -29,13 +29,7 @@ class DieselUp
      */
     private function login()
     {
-        if (file_exists('response.html')) {
-            $response = file_get_contents('response.html');
-        } else {
-            $response = $this->request($this->getUrl());
-
-            file_put_contents('response.html', $response);
-        }
+        $response = $this->request($this->getUrl());
 
         $document = new \DOMDocument;
         $document->loadHTML($response);
@@ -132,8 +126,8 @@ class DieselUp
         curl_setopt($ch, CURLOPT_REFERER, $url);
         curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0');
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_COOKIEJAR, 'cookie.dat');
-        curl_setopt($ch, CURLOPT_COOKIEFILE, 'cookie.dat');
+        curl_setopt($ch, CURLOPT_COOKIEJAR, '/tmp/cookie.dat');
+        curl_setopt($ch, CURLOPT_COOKIEFILE, '/tmp/cookie.dat');
         curl_setopt($ch, CURLOPT_VERBOSE, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
