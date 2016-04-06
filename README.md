@@ -1,11 +1,17 @@
-# System requirements
+
+DIESELUP
+========
+
+System requirements
+-------------------
 
 * *nix
 * Git
 * PHP 5.4.x (also `curl` and `php5-curl`)
 * Composer
 
-# Usage:
+Usage:
+------
 
 ```shell
 cd
@@ -21,7 +27,7 @@ Then set your username and password in `.env` file
 bin/dieselup YOUR-TOPIC-ID`
 ```
 
-## Cron task example:
+Cron task example:
 
 ```shell
 */1 * * * * /path/to/dieselup/bin/dieselup YOUR-TOPIC-ID > /dev/null 2>&1
