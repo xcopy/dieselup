@@ -2,7 +2,7 @@
 
 * *nix
 * Git
-* PHP 5.3.x (also `curl` and `php5-curl`)
+* PHP 5.4.x (also `curl` and `php5-curl`)
 * Composer
 
 # Usage:
