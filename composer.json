@@ -1,5 +1,6 @@
 {
     "name": "xcopy/dieselup",
+    "version": "1.0.1",
     "description": "Lift up your topic to the top in Diesel Forum",
     "keywords": ["diesel", "elcat", "up", "dieselup"],
     "homepage": "https://github.com/xcopy/dieselup",

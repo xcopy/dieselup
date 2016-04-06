@@ -101,7 +101,7 @@ class DieselUp
      * @param array $query
      * @return string
      */
-    private function getUrl($query = [])
+    private function getUrl(array $query = [])
     {
         return 'https://diesel.elcat.kg/index.php?'.http_build_query($query);
     }
@@ -112,7 +112,7 @@ class DieselUp
      * @param array $params
      * @return string
      */
-    private function request($url, $method = 'GET', $params = [])
+    private function request($url, $method = 'GET', array $params = [])
     {
         $ch = curl_init();
 
