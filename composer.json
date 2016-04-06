@@ -11,6 +11,7 @@
         "vlucas/phpdotenv": "^2.2",
         "symfony/console": "^3.0"
     },
+    "bin": ["bin/dieselup"],
     "autoload": {
         "classmap": ["src/"]
     }
