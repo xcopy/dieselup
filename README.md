@@ -15,7 +15,7 @@ composer install
 cp .env.dist .env`
 ```
 
-Set your username and password in `.env` file
+Then set your username and password in `.env` file
 
 ```shell
 bin/dieselup YOUR-TOPIC-ID`
@@ -24,7 +24,7 @@ bin/dieselup YOUR-TOPIC-ID`
 ## Cron task example:
 
 ```shell
-`*/1 * * * * /path/to/dieselup/bin/dieselup YOUR-TOPIC-ID > /dev/null 2>&1`
+*/1 * * * * /path/to/dieselup/bin/dieselup YOUR-TOPIC-ID > /dev/null 2>&1
 ```
 
 That's it!
