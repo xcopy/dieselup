@@ -13,6 +13,11 @@
         "vlucas/phpdotenv": "^2.2",
         "symfony/console": "^3.0"
     },
+    "scripts": {
+        "post-install-cmd": [
+            "cp .env.dist .env"
+        ]
+    },
     "bin": ["bin/dieselup"],
     "autoload": {
         "classmap": ["src/"]

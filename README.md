@@ -18,7 +18,6 @@ cd
 git clone git@github.com:xcopy/dieselup.git
 cd dieselup
 composer install
-cp .env.dist .env`
 ```
 
 Then set your username and password in `.env` file
