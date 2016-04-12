@@ -64,12 +64,6 @@ class DieselUp
 
         $xpath = new \DomXpath($document);
 
-        $error = $xpath->query('//div[contains(@class, "errorwrap")]');
-
-        if ($error->length) {
-            throw new \ErrorException('Page not found');
-        }
-
         $deleteLinks = $xpath->query('//a[contains(@href, "javascript:delete_post")]');
 
         if ($deleteLinks->length > 1) {
@@ -111,6 +105,7 @@ class DieselUp
      * @param string $method
      * @param array $params
      * @return string
+     * @throws ErrorException
      */
     private function request($url, $method = 'GET', array $params = [])
     {
@@ -135,6 +130,20 @@ class DieselUp
         $result = curl_exec($ch);
 
         curl_close($ch);
+
+        $document = new \DOMDocument;
+        $document->loadHTML($result);
+
+        $xpath = new \DomXpath($document);
+
+        $errors = $xpath->query('//div[contains(@class, "errorwrap")]');
+
+        if ($errors->length) {
+            /** @var $error \DOMElement */
+            $error = $errors->item(0);
+
+            throw new \ErrorException($error->getElementsByTagName('p')->item(0)->textContent);
+        }
 
         return (string) $result;
     }

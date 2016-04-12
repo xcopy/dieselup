@@ -1,5 +1,7 @@
 <?php
 
+libxml_use_internal_errors(true);
+
 class DieselUpTest extends \PHPUnit_Framework_TestCase
 {
     public function testDotEnvFileExists()
