@@ -129,20 +129,25 @@ class DieselUp
 
         $result = curl_exec($ch);
 
+        $error = curl_error($ch);
+
+        if (false !== $result) {
+            $document = new \DOMDocument;
+            $document->loadHTML($result);
+
+            $xpath = new \DomXpath($document);
+
+            $errors = $xpath->query('//div[contains(@class, "errorwrap")]');
+
+            if ($errors->length) {
+                $error = $errors->item(0)->getElementsByTagName('p')->item(0)->textContent;
+            }
+        }
+
         curl_close($ch);
 
-        $document = new \DOMDocument;
-        $document->loadHTML($result);
-
-        $xpath = new \DomXpath($document);
-
-        $errors = $xpath->query('//div[contains(@class, "errorwrap")]');
-
-        if ($errors->length) {
-            /** @var $error \DOMElement */
-            $error = $errors->item(0);
-
-            throw new \ErrorException($error->getElementsByTagName('p')->item(0)->textContent);
+        if ($error) {
+            throw new \ErrorException($error);
         }
 
         return (string) $result;
