@@ -1,18 +1,39 @@
 <?php
 
-use Dotenv\Dotenv;
-use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Unirest\Method;
+use Unirest\Request;
+use Unirest\Request\Body;
 
 class DieselUp
 {
+    const BASE_URL = 'https://diesel.elcat.kg/index.php';
+
+    /**
+     * @var ConsoleOutputInterface
+     */
+    private $output;
+
     /**
      * Constructor
      */
     public function __construct()
     {
-        $dotenv = new Dotenv(dirname(dirname(__FILE__)));
-        $dotenv->load();
+        (new Dotenv\Dotenv(dirname(dirname(__FILE__))))->load();
+
+        $this->output = new ConsoleOutput;
+
+        Request::cookieFile('/tmp/cookie.dat');
+    }
+
+    /**
+     * @param array $query
+     * @return string
+     */
+    public static function getUrl(array $query = [])
+    {
+        return static::BASE_URL.'?'.http_build_query($query);
     }
 
     /**
@@ -27,53 +48,66 @@ class DieselUp
     /**
      * @return void
      */
-    private function login()
+    protected function login()
     {
-        $response = $this->request($this->getUrl());
+        // request homepage
+        $response = $this->request(static::getUrl());
 
         $document = new \DOMDocument;
         $document->loadHTML($response);
 
+        // if not logged in
         if (!$document->getElementById('userlinks')) {
-            $this->request($this->getUrl(['act' => 'Login', 'CODE' => '01']), 'POST',[
-                'referer' => $this->getUrl(['from_login' => 1]),
-                'UserName' => getenv('USERNAME'),
-                'PassWord' => getenv('PASSWORD')
-            ]);
+            $url = static::getUrl(['act' => 'Login', 'CODE' => '01']);
+
+            $body = Body::form(['UserName' => getenv('USERNAME'), 'PassWord' => getenv('PASSWORD')]);
+
+            // request login
+            $this->request($url, Method::POST, $body);
         }
+
+        $this->output->writeln('<info>- Logged in</info>');
     }
 
     /**
      * @throws ErrorException
      * @throws LengthException
      */
-    private function post()
+    protected function post()
     {
+        // get arguments
         $argv = $_SERVER['argv'];
 
+        // remove first argument (i.e. path)
         array_shift($argv);
 
         if (!count($argv)) {
+            // topic ID is required argument
             throw new \LengthException('Not enough arguments');
         }
 
-        $response = $this->request($this->getUrl(['showtopic' => $argv[0]]));
+        // request topic page
+        $response = $this->request(static::getUrl(['showtopic' => $argv[0]]));
 
         $document = new \DOMDocument;
         $document->loadHTML($response);
 
         $xpath = new \DomXpath($document);
 
+        // find latest post(s)
         $deleteLinks = $xpath->query('//a[contains(@href, "javascript:delete_post")]');
 
+        // if last post found
         if ($deleteLinks->length > 1) {
             /** @var $lastLink \DOMElement */
             $lastLink = $deleteLinks->item($deleteLinks->length - 1);
 
             preg_match('/https?:[^\']+/', $lastLink->getAttribute('href'), $matches);
 
+            // delete last UP post
             if (!empty($matches)) {
                 $this->request($matches[0]);
+                $this->output->writeln('<info>- Last UP deleted</info>');
             }
         }
 
@@ -88,73 +122,46 @@ class DieselUp
             $replyParams[$input->getAttribute('name')] = $input->getAttribute('value');
         }
 
-        $this->request($this->getUrl(), 'POST', $replyParams);
-    }
+        // and reply new UP post
+        $this->request(static::getUrl(), Method::POST, Body::form($replyParams));
 
-    /**
-     * @param array $query
-     * @return string
-     */
-    private function getUrl(array $query = [])
-    {
-        return 'https://diesel.elcat.kg/index.php?'.http_build_query($query);
+        $this->output->writeln('<info>- New UP posted</info>');
     }
 
     /**
      * @param string $url
      * @param string $method
-     * @param array $params
+     * @param string $body
      * @return string
      * @throws ErrorException
      */
-    private function request($url, $method = 'GET', array $params = [])
+    protected function request($url, $method = Method::GET, $body = null)
     {
-        $ch = curl_init();
+        $this->output->writeln(sprintf('<comment>%s %s</comment>', $method, $url));
 
-        curl_setopt($ch, CURLOPT_URL, $url);
+        /** @var $response Unirest\Response */
+        $response = (strtoupper($method) === Method::POST)
+            ? Request::post($url, [], $body)
+            : Request::get($url);
 
-        if (strtoupper($method) === 'POST') {
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+        $result = (string) $response->body;
+
+        $document = new \DOMDocument;
+        $document->loadHTML($result);
+
+        $xpath = new \DomXpath($document);
+
+        $errors = $xpath->query('//div[contains(@class, "errorwrap")]');
+
+        if ($errors->length) {
+            throw new \ErrorException($errors->item(0)->getElementsByTagName('p')->item(0)->textContent);
         }
 
-        curl_setopt($ch, CURLOPT_REFERER, $url);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0');
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_COOKIEJAR, '/tmp/cookie.dat');
-        curl_setopt($ch, CURLOPT_COOKIEFILE, '/tmp/cookie.dat');
-        curl_setopt($ch, CURLOPT_VERBOSE, false);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-
-        $result = curl_exec($ch);
-
-        $error = curl_error($ch);
-
-        if (false !== $result) {
-            $document = new \DOMDocument;
-            $document->loadHTML($result);
-
-            $xpath = new \DomXpath($document);
-
-            $errors = $xpath->query('//div[contains(@class, "errorwrap")]');
-
-            if ($errors->length) {
-                $error = $errors->item(0)->getElementsByTagName('p')->item(0)->textContent;
-            }
-        }
-
-        curl_close($ch);
-
-        if ($error) {
-            throw new \ErrorException($error);
-        }
-
-        return (string) $result;
+        return $result;
     }
 }
 
 set_exception_handler(function ($e) {
-    $app = new Application;
+    $app = new Symfony\Component\Console\Application;
     $app->renderException($e, new ConsoleOutput);
 });

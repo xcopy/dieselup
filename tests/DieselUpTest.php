@@ -1,7 +1,5 @@
 <?php
 
-libxml_use_internal_errors(true);
-
 class DieselUpTest extends \PHPUnit_Framework_TestCase
 {
     public function testDotEnvFileExists()
@@ -9,12 +7,25 @@ class DieselUpTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists('.env');
     }
 
-    public function testRequestResultString()
+    public function testRequest()
     {
-        $method = new ReflectionMethod('DieselUp', 'request');
+        /** @var $response Unirest\Response */
+        $response = Unirest\Request::get(DieselUp::getUrl());
+
+        $this->assertEquals(200, $response->code);
+    }
+
+    /**
+     * @expectedException ErrorException
+     */
+    public function testRequestException()
+    {
+        $dieselUp = new DieselUp;
+
+        $method = new ReflectionMethod($dieselUp, 'request');
 
         $method->setAccessible(true);
 
-        $this->assertInternalType('string', $method->invoke(new DieselUp, 'https://diesel.elcat.kg/index.php'));
+        $method->invoke($dieselUp, $dieselUp::getUrl(['showtopic' => 1234567890]));
     }
 }

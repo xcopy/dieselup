@@ -4,9 +4,55 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "5813d1fb2c9539ddd46ca3db8b91f46f",
-    "content-hash": "36a023104394dc04105ae0a3271254ea",
+    "hash": "44f41a374c1d354b38261e7b9f663ef7",
+    "content-hash": "b62f5895a99da56243c6aff8981d9de9",
     "packages": [
+        {
+            "name": "mashape/unirest-php",
+            "version": "v3.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Mashape/unirest-php.git",
+                "reference": "c01f685e3b29fb520263e9a850d2cbd14d33a635"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Mashape/unirest-php/zipball/c01f685e3b29fb520263e9a850d2cbd14d33a635",
+                "reference": "c01f685e3b29fb520263e9a850d2cbd14d33a635",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "codeclimate/php-test-reporter": "0.1.*",
+                "phpunit/phpunit": "~4.4"
+            },
+            "suggest": {
+                "ext-json": "Allows using JSON Bodies for sending and parsing requests"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Unirest": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Unirest PHP",
+            "homepage": "https://github.com/Mashape/unirest-php",
+            "keywords": [
+                "client",
+                "curl",
+                "http",
+                "https",
+                "rest"
+            ],
+            "time": "2016-03-23 04:18:08"
+        },
         {
             "name": "symfony/console",
             "version": "v2.8.4",
