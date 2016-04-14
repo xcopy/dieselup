@@ -25,7 +25,7 @@ class DieselUp
         $this->output = new ConsoleOutput;
 
         Request::verifyPeer(false);
-        Request::verifyHost(false);
+        // Request::verifyHost(false);
         Request::cookieFile('/tmp/cookie.dat');
     }
 
