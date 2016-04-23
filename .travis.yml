@@ -8,4 +8,5 @@ php:
 before_script:
   - composer self-update
   - composer install --no-dev
+  - update-ca-certificates
 script: phpunit
