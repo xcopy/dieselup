@@ -1,5 +1,5 @@
 
-DIESELUP [![Build Status](https://travis-ci.org/xcopy/dieselup.svg?branch=master)](https://travis-ci.org/xcopy/dieselup)
+DIESELUP [![Build Status](https://travis-ci.org/xcopy/dieselup.svg?branch=master)](https://travis-ci.org/xcopy/dieselup) [![Latest Stable Version](https://poser.pugx.org/xcopy/dieselup/v/stable)](https://packagist.org/packages/xcopy/dieselup)
 ========
 
 System requirements
