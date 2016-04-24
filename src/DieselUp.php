@@ -41,8 +41,13 @@ class DieselUp
      */
     public function invoke()
     {
-        $this->login();
-        $this->post();
+        try {
+            $this->login();
+            $this->post();
+        } catch (\Exception $e) {
+            $app = new Symfony\Component\Console\Application;
+            $app->renderException($e, $this->output);
+        }
     }
 
     /**
@@ -165,8 +170,3 @@ class DieselUp
         return $result;
     }
 }
-
-set_exception_handler(function ($e) {
-    $app = new Symfony\Component\Console\Application;
-    $app->renderException($e, new ConsoleOutput);
-});
