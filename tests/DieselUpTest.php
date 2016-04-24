@@ -9,11 +9,6 @@ class DieselUpTest extends \PHPUnit_Framework_TestCase
     }
 
     /*
-    public function testDotEnvFileExists()
-    {
-        $this->assertFileExists('.env');
-    }
-
     public function testRequest()
     {
         $response = Unirest\Request::get(DieselUp::getUrl());

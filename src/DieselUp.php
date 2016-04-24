@@ -20,8 +20,6 @@ class DieselUp
      */
     public function __construct()
     {
-        (new Dotenv\Dotenv(dirname(dirname(__FILE__))))->load();
-
         $this->output = new ConsoleOutput;
 
         Request::verifyPeer(false);
