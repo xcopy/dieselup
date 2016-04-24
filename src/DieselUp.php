@@ -50,6 +50,8 @@ class DieselUp
      */
     protected function login()
     {
+        $this->output->writeln('<comment>Checking access</comment>');
+
         // request homepage
         $response = $this->request(static::getUrl());
 
@@ -58,6 +60,8 @@ class DieselUp
 
         // if not logged in
         if (!$document->getElementById('userlinks')) {
+            $this->output->writeln('<comment>Logging in</comment>');
+
             $url = static::getUrl(['act' => 'Login', 'CODE' => '01']);
 
             $body = Body::form(['UserName' => getenv('USERNAME'), 'PassWord' => getenv('PASSWORD')]);
@@ -66,7 +70,7 @@ class DieselUp
             $this->request($url, Method::POST, $body);
         }
 
-        $this->output->writeln('<info>- Logged in</info>');
+        $this->output->writeln('<info>Logged in</info>');
     }
 
     /**
@@ -107,8 +111,8 @@ class DieselUp
 
             // delete last UP post
             if (!empty($matches)) {
+                $this->output->writeln('<comment>Deleting last UP</comment>');
                 $this->request($matches[0]);
-                $this->output->writeln('<info>- Last UP deleted</info>');
             }
         }
 
@@ -123,10 +127,10 @@ class DieselUp
             $replyParams[$input->getAttribute('name')] = $input->getAttribute('value');
         }
 
+        $this->output->writeln('<info>Posting new UP</info>');
+
         // and reply new UP post
         $this->request(static::getUrl(), Method::POST, Body::form($replyParams));
-
-        $this->output->writeln('<info>- New UP posted</info>');
     }
 
     /**
@@ -138,7 +142,7 @@ class DieselUp
      */
     protected function request($url, $method = Method::GET, $body = null)
     {
-        $this->output->writeln(sprintf('<comment>%s %s</comment>', $method, $url));
+        $this->output->writeln(sprintf('<fg=white>%s %s</>', $method, $url));
 
         /** @var $response Unirest\Response */
         $response = (strtoupper($method) === Method::POST)
