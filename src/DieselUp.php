@@ -97,8 +97,9 @@ class DieselUp
         // find latest post(s)
         $deleteLinks = $xpath->query('//a[contains(@href, "javascript:delete_post")]');
 
-        // if last post found
-        if ($deleteLinks->length > 1) {
+        // any posts?
+        // todo: delete ONLY "UP" post
+        if ($deleteLinks->length) {
             /** @var $lastLink \DOMElement */
             $lastLink = $deleteLinks->item($deleteLinks->length - 1);
 
