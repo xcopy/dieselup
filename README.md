@@ -14,11 +14,8 @@ Usage:
 ------
 
 ```shell
-cd
-git clone git@github.com:xcopy/dieselup.git
-cd dieselup
-composer install
-USERNAME=your-username PASSWORD=your-password bin/dieselup YOUR-TOPIC-ID
+composer global require xcopy/dieselup
+USERNAME=your-username PASSWORD=your-password dieselup <YOUR-TOPIC-ID>
 ```
 
 Cron task example:
@@ -27,7 +24,7 @@ Cron task example:
 USERNAME=your-username
 PASSWORD=your-password
 ...
-*/1 * * * * /path/to/dieselup/bin/dieselup YOUR-TOPIC-ID > /dev/null 2>&1
+*/1 * * * * $HOME/.composer/vendor/bin/dieselup <YOUR-TOPIC-ID> > /dev/null 2>&1
 ```
 
 That's it!
