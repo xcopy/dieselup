@@ -172,7 +172,7 @@ class DieselUp
      * @param string $method
      * @param string $body
      * @return string
-     * @throws HttpException
+     * @throws Exception
      */
     protected function request($url, $method = Method::GET, $body = null)
     {
@@ -199,7 +199,7 @@ class DieselUp
         */
 
         if ($response->code !== HttpResponse::HTTP_OK) {
-            throw new \HttpException(HttpResponse::$statusTexts[$response->code], $response->code);
+            throw new \Exception(HttpResponse::$statusTexts[$response->code], $response->code);
         }
 
         return $result;
