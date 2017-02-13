@@ -2,7 +2,9 @@
 
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Unirest\Method;
+use Unirest\Response;
 use Unirest\Request;
 use Unirest\Request\Body;
 
@@ -64,15 +66,42 @@ class DieselUp
         $document->loadHTML($response);
 
         // if not logged in
-        if (!$document->getElementById('userlinks')) {
+        if (!$document->getElementById('user_link')) {
             $this->output->writeln('<comment>Logging in</comment>');
 
-            $url = static::getUrl(['act' => 'Login', 'CODE' => '01']);
+            $urlParams = [
+                'app' => 'core',
+                'module' => 'global',
+                'section' => 'login'
+            ];
 
-            $body = Body::form(['UserName' => getenv('USERNAME'), 'PassWord' => getenv('PASSWORD')]);
+            $loginParams = [
+                'ips_username' => getenv('USERNAME'),
+                'ips_password' => getenv('PASSWORD'),
+                'rememberMe' => 1
+            ];
+
+            // request login page
+            $response = $this->request(static::getUrl($urlParams));
+
+            $document->loadHTML($response);
+
+            $xpath = new \DomXpath($document);
+
+            $loginForm = $xpath->query('//form[@id="login"]')->item(0);
+
+            // find hidden inputs
+            $hiddenInputs = $xpath->query('.//input[contains(@type, "hidden")]', $loginForm);
+
+            foreach ($hiddenInputs as $input) {
+                /** @var $input \DOMElement */
+                $loginParams[$input->getAttribute('name')] = $input->getAttribute('value');
+            }
+
+            $urlParams['do'] = 'process';
 
             // request login
-            $this->request($url, Method::POST, $body);
+            $this->request(static::getUrl($urlParams), Method::POST, Body::Form($loginParams));
         }
 
         $this->output->writeln('<info>Logged in</info>');
@@ -104,7 +133,7 @@ class DieselUp
         $xpath = new \DomXpath($document);
 
         // find latest post(s)
-        $deleteLinks = $xpath->query('//a[contains(@href, "javascript:delete_post")]');
+        $deleteLinks = $xpath->query('//a[contains(@class, "delete_post")]');
 
         // any posts?
         // todo: delete ONLY "UP" post
@@ -123,9 +152,9 @@ class DieselUp
 
         $replyParams = ['Post' => 'UP'];
 
-        $replyForms = $xpath->query('//form[contains(@name, "REPLIER")]');
+        $replyForm = $xpath->query('//form[@id="ips_fastReplyForm"]')->item(0);
 
-        $hiddenInputs = $xpath->query('.//input[contains(@type, "hidden")]', $replyForms->item(0));
+        $hiddenInputs = $xpath->query('.//input[contains(@type, "hidden")]', $replyForm);
 
         foreach ($hiddenInputs as $input) {
             /** @var $input \DOMElement */
@@ -135,7 +164,7 @@ class DieselUp
         $this->output->writeln('<info>Posting new UP</info>');
 
         // and reply new UP post
-        $this->request(static::getUrl(), Method::POST, Body::form($replyParams));
+        $this->request(static::getUrl(), Method::POST, Body::Form($replyParams));
     }
 
     /**
@@ -143,28 +172,34 @@ class DieselUp
      * @param string $method
      * @param string $body
      * @return string
-     * @throws ErrorException
+     * @throws HttpException
      */
     protected function request($url, $method = Method::GET, $body = null)
     {
         $this->output->writeln(sprintf('<fg=white>%s %s</>', $method, $url));
 
-        /** @var $response Unirest\Response */
+        /** @var $response Response */
         $response = (strtoupper($method) === Method::POST)
             ? Request::post($url, [], $body)
             : Request::get($url);
 
         $result = (string) $response->body;
 
+        /*
         $document = new \DOMDocument;
         $document->loadHTML($result);
 
         $xpath = new \DomXpath($document);
 
-        $errors = $xpath->query('//div[contains(@class, "errorwrap")]');
+        $errors = $xpath->query('//h1[contains(@class, "ipsType_pagetitle")]');
 
         if ($errors->length) {
-            throw new \ErrorException($errors->item(0)->getElementsByTagName('p')->item(0)->textContent);
+            throw new \ErrorException($errors->item(0)->textContent);
+        }
+        */
+
+        if ($response->code !== HttpResponse::HTTP_OK) {
+            throw new \HttpException(HttpResponse::$statusTexts[$response->code], $response->code);
         }
 
         return $result;

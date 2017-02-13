@@ -8,28 +8,17 @@ class DieselUpTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('https://diesel.elcat.kg/index.php?foo=bar', DieselUp::getUrl(['foo' => 'bar']));
     }
 
-    /*
-    public function testRequest()
+    public function testSuccessfulRequest()
     {
         $response = Unirest\Request::get(DieselUp::getUrl());
 
         $this->assertEquals(200, $response->code);
     }
-    */
 
-    /**
-     * @expectedException ErrorException
-     */
-    /*
-    public function testRequestException()
+    public function testFailedRequest()
     {
-        $dieselUp = new DieselUp;
+        $response = Unirest\Request::get(DieselUp::getUrl(['showtopic' => 1]));
 
-        $method = new ReflectionMethod($dieselUp, 'request');
-
-        $method->setAccessible(true);
-
-        $method->invoke($dieselUp, $dieselUp::getUrl(['showtopic' => 1234567890]));
+        $this->assertEquals(404, $response->code);
     }
-    */
 }

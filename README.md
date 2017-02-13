@@ -7,7 +7,8 @@ System requirements
 
 * *nix
 * Git
-* PHP 5.4.x (also `curl` and `php5-curl`)
+* [cURL](http://php.net/manual/en/book.curl.php)
+* PHP 5.6+ (`curl`, `json` and `dom` extensions)
 * Composer
 
 Usage:
